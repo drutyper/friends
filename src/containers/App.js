@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import CardList from './CardList';
-import SearchBox from './SearchBox'
-import Scroll from './Scroll'
+import CardList from '../components/CardList';
+import SearchBox from '../components/SearchBox';
+import Scroll from '../components/Scroll';
+import ErrorBoundry from '../components/ErrorBoundry';
 import './App.css';
 
 class App extends Component {
@@ -25,15 +26,18 @@ class App extends Component {
   }
 
   render() {
-    const filteredAnimals = this.state.animals.filter(animals =>{
-      return animals.name.toLowerCase().includes(this.state.searchfield.toLowerCase())
+    const {animals, searchfield} = this.state;
+    const filteredAnimals = animals.filter(animal =>{
+      return animal.name.toLowerCase().includes(searchfield.toLowerCase())
     })
     return (
       <div className='tc'>
         <h1 className='f1'>AsianFriends</h1>
         <SearchBox searchChange={this.onSearchChange}/>
         <Scroll>
-          <CardList animals={filteredAnimals} />
+          <ErrorBoundry>
+            <CardList animals={filteredAnimals} />
+          </ErrorBoundry>  
         </Scroll>
       </div>
     );
