@@ -5,51 +5,48 @@ import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import ErrorBoundry from '../components/ErrorBoundry';
 import './App.css';
-import { setSearchField } from '../actions'
+import { setSearchField, requestAnimals } from '../actions'
 
 const mapStateToProps = state => {
   return {
-    searchField: state.searchField
+    searchField: state.searchAnimals.searchField,
+    animals: state.requestAnimals.animals,
+    isPending: state.requestAnimals.isPending,
+    error: state.requestAnimals.error
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onSearchChange: (event) => dispatch(setSearchField(event.target.value)) 
+    onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+    onRequestAnimals: () => dispatch(requestAnimals())
   }
 }
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      animals: []
-    }
-  }
 
   componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(response=> response.json())
-      .then(users => this.setState({animals: users}));
+    this.props.onRequestAnimals();
   }
 
   render() {
-    const { animals } = this.state;
-    const { searchField, onSearchChange } = this.props;
+    const { searchField, onSearchChange, animals, isPending } = this.props;
     const filteredAnimals = animals.filter(animal =>{
       return animal.name.toLowerCase().includes(searchField.toLowerCase())
     })
-    return (
-      <div className='tc'>
-        <h1 className='f1'>AsianFriends</h1>
-        <SearchBox searchChange={onSearchChange}/>
-        <Scroll>
-          <ErrorBoundry>
-            <CardList animals={filteredAnimals} />
-          </ErrorBoundry>  
-        </Scroll>
-      </div>
-    );
+    return isPending ?
+      <h1>Loading</h1> :
+      (
+        <div className='tc'>
+          <h1 className='f1'>AsianFriends</h1>
+          <SearchBox searchChange={onSearchChange}/>
+          <Scroll>
+            <ErrorBoundry>
+              <CardList animals={filteredAnimals} />
+            </ErrorBoundry>  
+          </Scroll>
+        </div>
+      );
   }
 }
 
